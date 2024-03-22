@@ -11,17 +11,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import org.example.compiler.BackwardRegexCompiler
+import org.example.model.RegexSymbol
 
 @Composable
 @Preview
 fun App() {
     val compiler = BackwardRegexCompiler()
-    val nbElements = 15
+    val nbElements = 8
+
+    var exampleTexts = listOf<String>()
 
     var textualRegex by remember { mutableStateOf("") }
     var regex by remember { mutableStateOf( Regex("") ) }
@@ -45,20 +55,19 @@ fun App() {
                     Box{
                         TextField(
                             value = textualRegex,
-                            onValueChange = { textualRegex = it },
+                            onValueChange = {
+                                textualRegex = it
+                                if (isRegexValid(textualRegex)) {
+                                    regex = Regex(textualRegex)
+                                    compiledRegex = compiler.generate(regex)
+                                    exampleTexts = generateTexts(compiledRegex, nbElements)
+                                }
+                            },
                             placeholder = { Text("Enter a regular expression.") },
                             isError = !isRegexValid( textualRegex ),
-                            modifier = Modifier.fillMaxWidth(0.8F)
+                            modifier = Modifier.fillMaxWidth(),
+                            visualTransformation = RegexColoring()
                         )
-                    }
-                    Button(
-                        onClick = {
-                            regex = Regex(textualRegex)
-                            compiledRegex = compiler.generate(regex)
-                        },
-                        enabled = isRegexValid( textualRegex )
-                    ) {
-                        Text("Generate")
                     }
                 }
 
@@ -75,10 +84,10 @@ fun App() {
                         .fillMaxWidth()
 
                 ) {
-                    for (i in 1..nbElements) {
+                    for (text in exampleTexts) {
                         item {
                             GeneratedTextItem(
-                                compiledRegex.generateMatchingText(),
+                                text,
                                 regex
                             )
                         }
@@ -87,6 +96,27 @@ fun App() {
             }
         }
     }
+}
+
+fun generateTexts(compiledRegex : RegexSymbol, size : Int, maxAttempts : Int = 10) : List<String> {
+    val res = mutableListOf<String>()
+
+    for(i in 1..size) {
+        var newText: String
+        var attempts = 0
+        do {
+            newText = compiledRegex.generateMatchingText()
+            attempts++
+        }while(newText in res && attempts < maxAttempts)
+
+        if (attempts >= maxAttempts) {
+            break
+        } else {
+            res += newText
+        }
+    }
+
+    return res
 }
 
 fun isRegexValid(text : String) : Boolean = try {
@@ -117,7 +147,7 @@ fun GeneratedTextItem(text : String, regex : Regex) {
                 modifier = Modifier
                     .fillMaxWidth(0.8F),
                 textAlign = TextAlign.Center,
-                style = TextStyle(color = color)
+                style = TextStyle(color = color, fontSize = 30.sp)
             )
         }
     }
