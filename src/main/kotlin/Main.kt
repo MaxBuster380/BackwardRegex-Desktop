@@ -24,13 +24,14 @@ import org.example.model.RegexSymbol
 @Preview
 fun App() {
     val compiler = BackwardRegexCompiler()
-    val nbElements = 8
-
-    var exampleTexts = listOf<String>()
+    val nbElements = 7
 
     var textualRegex by remember { mutableStateOf("") }
     var regex by remember { mutableStateOf( Regex("") ) }
     var compiledRegex by remember { mutableStateOf(compiler.generate("".toRegex())) }
+    var errorText : String? by remember { mutableStateOf(null) }
+
+    var exampleTexts = generateTexts(compiledRegex, nbElements)
 
     MaterialTheme {
         Column(
@@ -44,22 +45,32 @@ fun App() {
             ) {
 
                 Box {
-                    TextField(
-                        value = textualRegex,
-                        onValueChange = {
-                            textualRegex = it
-                            if (isRegexValid(textualRegex)) {
-                                regex = Regex(textualRegex)
-                                compiledRegex = compiler.generate(regex)
-                                exampleTexts = generateTexts(compiledRegex, nbElements)
-                            }
-                        },
-                        placeholder = { Text("Enter a regular expression.", fontSize = 20.sp) },
-                        isError = !isRegexValid(textualRegex),
-                        modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = RegexColoring()
+                    Column {
+                        TextField(
+                            value = textualRegex,
+                            onValueChange = {
+                                textualRegex = it
+                                if (isRegexValid(textualRegex)) {
+                                    regex = Regex(textualRegex)
+                                    try {
+                                        compiledRegex = compiler.generate(regex)
+                                        exampleTexts = generateTexts(compiledRegex, nbElements)
+                                        errorText = null
+                                    } catch (_: Exception) {
+                                        errorText = "This regular expression is valid but couldn't be analyzed. Please report it."
+                                    }
+                                }
+                            },
+                            placeholder = { Text("Enter a regular expression.", fontSize = 20.sp) },
+                            isError = !isRegexValid(textualRegex),
+                            modifier = Modifier.fillMaxWidth(),
+                            visualTransformation = RegexColoring()
 
-                    )
+                        )
+                        if (errorText != null) {
+                            Text(errorText!!, color = Color.Red)
+                        }
+                    }
                 }
 
                 Spacer(
@@ -114,7 +125,9 @@ fun isRegexValid(text : String) : Boolean = try {
 
 @Composable
 fun GeneratedTextItem(text : String, regex : Regex) {
-    val backgroundColor = if ( regex.matches(text) ) {
+    val matchError = !regex.matches(text)
+
+    val backgroundColor = if ( !matchError ) {
         Color(0.75f, 0.75f, 0.75f)
     } else {
         Color.Red
@@ -138,8 +151,22 @@ fun GeneratedTextItem(text : String, regex : Regex) {
                 modifier = Modifier
                     .background(backgroundColor),
                 textAlign = TextAlign.Center,
-                style = TextStyle(color = Color.Black, fontSize = 30.sp)
+                style = TextStyle(
+                    color = Color.Black,
+                    fontSize = 30.sp
+                )
             )
+
+            if ( matchError ) {
+                Text(
+                    "This text doesn't match the regular expression. Please report it.",
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        color = Color.Red,
+                        fontSize = 15.sp
+                    )
+                )
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ class RegexColoring : VisualTransformation {
         private val structureColor = Color(1.0F, 0.5F, 0F)
         private val shortcutCharacterColor = Color.Blue
         private val specialCharacterColor = Color.Gray
+        private val groupColor = Color(0F, 0.5F, 0.5F)
         private val otherColor = Color.Black
 
         private val size = 20.sp
@@ -44,6 +45,8 @@ class RegexColoring : VisualTransformation {
                     shortcutCharacterColor
                 } else if (nextChar in "nrt\\") {
                     specialCharacterColor
+                } else if (nextChar.isDigit()) {
+                    groupColor
                 } else {
                     otherColor
                 }
