@@ -5,6 +5,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 
 class RegexColoring : VisualTransformation {
 
@@ -13,6 +14,8 @@ class RegexColoring : VisualTransformation {
         private val shortcutCharacterColor = Color.Blue
         private val specialCharacterColor = Color.Gray
         private val otherColor = Color.Black
+
+        private val size = 20.sp
     }
 
     override fun filter(text: AnnotatedString): TransformedText {
@@ -30,7 +33,7 @@ class RegexColoring : VisualTransformation {
             val char = text[i]
 
             if (char in "^$[](){}|+*?") {
-                builder.withStyle(style = SpanStyle(color = structureColor)) { append(char) }
+                builder.withStyle(style = SpanStyle(color = structureColor, fontSize = size)) { append(char) }
                 i++
                 continue
             }
@@ -45,12 +48,12 @@ class RegexColoring : VisualTransformation {
                     otherColor
                 }
 
-                builder.withStyle(style = SpanStyle(color = color)) { append("\\$nextChar") }
+                builder.withStyle(style = SpanStyle(color = color, fontSize = size)) { append("\\$nextChar") }
                 i += 2
                 continue
             }
 
-            builder.withStyle(style = SpanStyle(color = otherColor)) { append(text[i]) }
+            builder.withStyle(style = SpanStyle(color = otherColor, fontSize = size)) { append(text[i]) }
             i++
         }
 
