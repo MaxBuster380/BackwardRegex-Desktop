@@ -1,4 +1,3 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,7 +6,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -17,7 +15,10 @@ import org.example.model.RegexSymbol
 
 @Composable
 
-fun BackwardRegexBox(modifier : Modifier = Modifier) {
+fun BackwardRegexBox(
+    modifier: Modifier = Modifier,
+    colorTheme: ColorTheme
+) {
     val compiler = BackwardRegexCompiler()
     val nbElements = 7
 
@@ -59,11 +60,11 @@ fun BackwardRegexBox(modifier : Modifier = Modifier) {
                         placeholder = { Text("Enter a regular expression.", fontSize = 20.sp) },
                         isError = !isRegexValid(textualRegex),
                         modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = RegexColoring()
+                        visualTransformation = RegexColoring(colorTheme)
 
                     )
                     if (errorText != null) {
-                        Text(errorText!!, color = Color.Red)
+                        Text(errorText!!, color = colorTheme.errorText)
                     }
                 }
             }
@@ -83,7 +84,7 @@ fun BackwardRegexBox(modifier : Modifier = Modifier) {
             ) {
                 for (text in exampleTexts)
                     item {
-                        GeneratedTextItem(text, regex)
+                        GeneratedTextItem(text, regex, colorTheme)
                     }
             }
         }
@@ -120,13 +121,13 @@ fun isRegexValid(text : String) : Boolean = try {
 }
 
 @Composable
-fun GeneratedTextItem(text : String, regex : Regex) {
+fun GeneratedTextItem(text: String, regex: Regex, colorTheme: ColorTheme) {
     val matchError = !regex.matches(text)
 
     val backgroundColor = if ( !matchError ) {
-        Color(0.75f, 0.75f, 0.75f)
+        colorTheme.validMatchBackground
     } else {
-        Color.Red
+        colorTheme.errorText
     }
 
     Box(
@@ -139,7 +140,7 @@ fun GeneratedTextItem(text : String, regex : Regex) {
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxWidth()
-                .background(Color.Gray),
+                .background(colorTheme.characterBackground),
         ) {
 
             Text(
@@ -148,7 +149,7 @@ fun GeneratedTextItem(text : String, regex : Regex) {
                     .background(backgroundColor),
                 textAlign = TextAlign.Center,
                 style = TextStyle(
-                    color = Color.Black,
+                    color = colorTheme.validMatchText,
                     fontSize = 30.sp
                 )
             )
@@ -158,7 +159,7 @@ fun GeneratedTextItem(text : String, regex : Regex) {
                     "This text doesn't match the regular expression. Please report it.",
                     textAlign = TextAlign.Center,
                     style = TextStyle(
-                        color = Color.Red,
+                        color = colorTheme.errorText,
                         fontSize = 15.sp
                     )
                 )

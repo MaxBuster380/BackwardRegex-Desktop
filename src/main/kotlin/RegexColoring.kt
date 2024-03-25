@@ -1,4 +1,3 @@
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.input.OffsetMapping
@@ -7,15 +6,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 
-class RegexColoring : VisualTransformation {
+class RegexColoring(
+    private val colorTheme: ColorTheme
+) : VisualTransformation {
 
     companion object {
-        private val structureColor = Color(1.0F, 0.5F, 0F)
-        private val shortcutCharacterColor = Color.Blue
-        private val specialCharacterColor = Color.Gray
-        private val groupColor = Color(0F, 0.5F, 0.5F)
-        private val otherColor = Color.Black
-
         private val size = 20.sp
     }
 
@@ -34,7 +29,11 @@ class RegexColoring : VisualTransformation {
             val char = text[i]
 
             if (char in "^$[](){}|+*?") {
-                builder.withStyle(style = SpanStyle(color = structureColor, fontSize = size)) { append(char) }
+                builder.withStyle(style = SpanStyle(color = colorTheme.regexStructureColor, fontSize = size)) {
+                    append(
+                        char
+                    )
+                }
                 i++
                 continue
             }
@@ -42,13 +41,13 @@ class RegexColoring : VisualTransformation {
             if (char == '\\' && i+1 < text.length) {
                 val nextChar = text[i+1]
                 val color = if (nextChar in ".dDwWsS") {
-                    shortcutCharacterColor
+                    colorTheme.regexShortcutCharacterColor
                 } else if (nextChar in "nrt\\") {
-                    specialCharacterColor
+                    colorTheme.regexSpecialCharacterColor
                 } else if (nextChar.isDigit()) {
-                    groupColor
+                    colorTheme.regexGroupColor
                 } else {
-                    otherColor
+                    colorTheme.regexOtherColor
                 }
 
                 builder.withStyle(style = SpanStyle(color = color, fontSize = size)) { append("\\$nextChar") }
@@ -56,7 +55,12 @@ class RegexColoring : VisualTransformation {
                 continue
             }
 
-            builder.withStyle(style = SpanStyle(color = otherColor, fontSize = size)) { append(text[i]) }
+            builder.withStyle(
+                style = SpanStyle(
+                    color = colorTheme.regexOtherColor,
+                    fontSize = size
+                )
+            ) { append(text[i]) }
             i++
         }
 
