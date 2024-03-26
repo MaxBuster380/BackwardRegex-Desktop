@@ -57,7 +57,13 @@ fun BackwardRegexBox(
                                 }
                             }
                         },
-                        placeholder = { Text("Enter a regular expression.", fontSize = 20.sp) },
+                        placeholder = {
+                            Text(
+                                "Enter a regular expression.",
+                                fontSize = 20.sp,
+                                color = colorTheme.regexTextFieldSuggestion
+                            )
+                        },
                         isError = !isRegexValid(textualRegex),
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = RegexColoring(colorTheme)

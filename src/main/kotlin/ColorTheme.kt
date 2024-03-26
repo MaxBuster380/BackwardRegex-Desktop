@@ -11,5 +11,6 @@ data class ColorTheme(
     val regexShortcutCharacterColor: Color,
     val regexSpecialCharacterColor: Color,
     val regexGroupColor: Color,
-    val regexOtherColor: Color
+    val regexOtherColor: Color,
+    val regexTextFieldSuggestion: Color
 )

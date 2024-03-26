@@ -1,4 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -13,7 +14,9 @@ import androidx.compose.ui.window.application
 fun App(colorTheme: ColorTheme) {
     MaterialTheme {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = colorTheme.background)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -38,6 +41,6 @@ fun main() = application {
         title = "BackwardRegex-Desktop",
         onCloseRequest = ::exitApplication
     ) {
-        App(ColorThemes.LIGHT_THEME_1.colorTheme)
+        App(ColorThemes.DARK_THEME_1.colorTheme)
     }
 }
