@@ -1,6 +1,7 @@
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
@@ -61,12 +62,17 @@ class RegexColoring(
 
             if (char == '\\' && i+1 < text.length) {
                 val nextChar = text[i+1]
+
+                if (nextChar.isDigit()) {
+                    addBoldString(builder, "\\$nextChar", colorTheme.regexOtherColor)
+                    i += 2
+                    continue
+                }
+
                 val color = if (nextChar in "dDwWsS") {
                     colorTheme.regexShortcutCharacterColor
                 } else if (nextChar in "nrt\\.") {
                     colorTheme.regexSpecialCharacterColor
-                } else if (nextChar.isDigit()) {
-                    colorTheme.regexGroupColor
                 } else {
                     colorTheme.regexOtherColor
                 }
@@ -88,6 +94,16 @@ class RegexColoring(
             style = SpanStyle(
                 color = color,
                 fontSize = size
+            )
+        ) { append(text) }
+    }
+
+    private fun addBoldString(builder: AnnotatedString.Builder, text: String, color: Color) {
+        builder.withStyle(
+            style = SpanStyle(
+                color = color,
+                fontSize = size,
+                fontWeight = FontWeight.Bold
             )
         ) { append(text) }
     }
