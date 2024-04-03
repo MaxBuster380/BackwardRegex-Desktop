@@ -1,6 +1,7 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -10,8 +11,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.example.compiler.BackwardRegexCompiler
-import org.example.model.RegexSymbol
+import com.github.MaxBuster380.compiler.BackwardRegexCompiler
+import com.github.MaxBuster380.compiler.CompiledBackwardRegex
 
 @Composable
 
@@ -67,7 +68,6 @@ fun BackwardRegexBox(
                         isError = !isRegexValid(textualRegex),
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = RegexColoring(colorTheme)
-
                     )
                     if (errorText != null) {
                         Text(errorText!!, color = colorTheme.errorText)
@@ -88,33 +88,35 @@ fun BackwardRegexBox(
                     .fillMaxWidth()
 
             ) {
-                for (text in exampleTexts)
-                    item {
-                        GeneratedTextItem(text, regex, colorTheme)
-                    }
+                items(
+                    items = exampleTexts
+                ) {
+                    GeneratedTextItem(it, regex, colorTheme)
+                }
             }
         }
     }
 }
 
 
-
-fun generateTexts(compiledRegex : RegexSymbol, size : Int, maxAttempts : Int = 10) : List<String> {
+fun generateTexts(compiledRegex: CompiledBackwardRegex, size: Int, maxAttempts: Int = 10): List<String> {
     val res = mutableListOf<String>()
 
     for(i in 1..size) {
-        var newText: String
+        var newText: String?
         var attempts = 0
         do {
             newText = compiledRegex.generateMatchingText()
             attempts++
-        }while(newText in res && attempts < maxAttempts)
+        } while (newText != null && newText in res && attempts < maxAttempts)
 
-        if (attempts >= maxAttempts) {
+        if (newText == null)
             break
-        } else {
-            res += newText
-        }
+
+        if (attempts >= maxAttempts)
+            break
+
+        res += newText
     }
 
     return res
@@ -146,13 +148,13 @@ fun GeneratedTextItem(text: String, regex: Regex, colorTheme: ColorTheme) {
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxWidth()
-                .background(colorTheme.characterBackground),
+                .background(backgroundColor),
         ) {
 
             Text(
                 text,
                 modifier = Modifier
-                    .background(backgroundColor),
+                    .fillMaxWidth(0.9F),
                 textAlign = TextAlign.Center,
                 style = TextStyle(
                     color = colorTheme.validMatchText,
@@ -167,6 +169,15 @@ fun GeneratedTextItem(text: String, regex: Regex, colorTheme: ColorTheme) {
                     style = TextStyle(
                         color = colorTheme.errorText,
                         fontSize = 15.sp
+                    )
+                )
+            } else {
+                Text(
+                    "\uD83D\uDDF8",
+                    modifier = Modifier
+                        .fillMaxWidth(0.1F),
+                    style = TextStyle(
+                        fontSize = 30.sp
                     )
                 )
             }
