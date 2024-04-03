@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="100">
+
+    <circle cx="50" cy="50" r="45" fill="rgb(128,128,128)"/>
+
+
+    <!--<polygon fill="blue" points="20,100 80,100 80,30 80,10 69.5,7.4"/>-->
+
+    <polygon fill="rgb(96,64,144)" points="69.5,7.4 20,100 60,70"/>
+    <circle cx="50" cy="30" r="30" fill="rgb(100,68,148)"/>
+
+    <polygon fill="rgb(96,0,128)" points="20,100 80,100 60,70"/>
+    <polygon fill="rgb(128,96,128)" points="80,100 80,10 60,70"/>
+    <polygon fill="rgb(96,90,132)" points="80,10 69.5,7.4 60,70"/>
+</svg>
